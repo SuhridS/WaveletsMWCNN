@@ -7,6 +7,52 @@
 
 ## File structure
 
+│   environment_requirements.yml
+│   LICENSE
+│   README.md
+│
+├───data_gen
+│   │   A_data_generation.m
+│   │   patches_generation.m
+│   │   stride_init.m
+│   │
+│   └───MWCNN
+└───MWCNN_code
+    │   dataloader.py
+    │   main.py
+    │   option.py
+    │   template.py
+    │   trainer.py
+    │   utility.py
+    │   __init__.py
+    │
+    ├───data
+    │   │   benchmark.py
+    │   │   common.py
+    │   │   demo.py
+    │   │   div2k.py
+    │   │   srdata.py
+    │   │   __init__.py   
+    │
+    ├───experiment
+    ├───loss
+    │   │   adversarial.py
+    │   │   discriminator.py
+    │   │   vgg.py
+    │   │   __init__.py
+    │   │
+    │   └───__pycache__
+    │           __init__.cpython-35.pyc
+    │
+    ├───model
+    │   │   common.py
+    │   │   mwcnn.py
+    │   │   __init__.py
+    │
+    ├───pretrained_models
+    └───tmp
+
+
 
 ## Creating the correct environment
 
