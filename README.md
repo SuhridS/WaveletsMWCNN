@@ -13,6 +13,19 @@
 
 ## Creating the correct environment
 
+Step 1: Cloning the repository
+
+```bash
+git clone https://github.com/SuhridS/Wavelets_MWCNN.git
+```
+
+Step 2: Setting the conda environment
+
+```bash
+conda env create -f environment_requirements.yml
+
+```
+
 
 ## Dataset and data preprocessing
 
