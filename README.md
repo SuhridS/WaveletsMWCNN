@@ -7,6 +7,7 @@
 
 ## File structure
 
+```
 .
 │   environment_requirements.yml
 │   LICENSE
@@ -52,7 +53,7 @@
     │
     ├───pretrained_models
     └───tmp
-
+```
 
 ## Creating the correct environment
 
