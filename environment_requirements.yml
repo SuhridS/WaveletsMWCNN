@@ -1,12 +1,12 @@
 name: mwcnn
 channels:
-  - conda-forge
   - pytorch
+  - conda-forge
   - defaults
 dependencies:
   - blas=1.0=mkl
-  - ca-certificates=2020.10.14=0
-  - certifi=2020.6.20=pyhd3eb1b0_3
+  - ca-certificates=2020.12.5=h5b45459_0
+  - certifi=2018.8.24=py35_1001
   - cffi=1.11.5=py35h74b6da3_1
   - cloudpickle=1.6.0=py_0
   - cuda100=1.0=0
@@ -22,6 +22,7 @@ dependencies:
   - intel-openmp=2019.4=245
   - jpeg=9b=hb83a4c4_2
   - kiwisolver=1.0.1=py35h6538335_0
+  - libopencv=3.4.1=h875b8b8_3
   - libpng=1.6.37=h2a8f88b_0
   - libtiff=4.1.0=h56a325e_1
   - lz4-c=1.9.2=hf4a77e7_3
@@ -34,9 +35,11 @@ dependencies:
   - numpy=1.15.2=py35ha559c80_0
   - numpy-base=1.15.2=py35h8128ebf_0
   - olefile=0.46=py35_0
+  - opencv=3.4.1=py35h6fd60c2_3
   - openssl=1.1.1h=he774522_0
   - pillow=5.2.0=py35h08bbbbd_0
   - pip=20.2.4=py_0
+  - py-opencv=3.4.1=py35h1b0d24d_3
   - pycparser=2.20=py_2
   - pyparsing=2.4.7=py_0
   - pyqt=5.9.2=py35h6538335_2
