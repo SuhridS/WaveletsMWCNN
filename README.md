@@ -97,6 +97,10 @@ For example, "folder_train  = {'C:\Users\suhri\Desktop\ECE 251C\Project\DIV2K' }
 
 Third, run 'A_data_generation.m' and confirm that the patches are being generated.
 
+Step 3: Downloading test data
+You can use any test data of your choice.
+Some popular datasets have been downloaded [here](https://drive.google.com/drive/folders/1HlIgV_l-RD-0bI5PTGj3F5VGWW7tZi1O?usp=sharing).
+
 
 ## Experiments performed
 
