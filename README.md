@@ -70,6 +70,9 @@ conda env create -f environment_requirements.yml
 
 ```
 
+```bash
+conda activate mwcnn
+```
 
 ## Dataset and data preprocessing
 
@@ -79,8 +82,9 @@ To download the dataset, use the command below:
 ```bash
 cd data_gen
 wget "http://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_HR.zip"
+unzip DIV2K_train_HR.zip .
 ```
-or simply click [here](http://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_HR.zip).
+or simply click [here](http://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_HR.zip) and unzip it.
 
 Step 2: Processing the images into patches:
 
@@ -89,8 +93,10 @@ Firstly, on Matlab, perform the following
 cd data_gen #if not already in data_gen
 ```
 Second, edit the path provided in 'A_data_generation.m' (line 12) to the location of the DIV2K dataset downloaded in step 1.
+For example, "folder_train  = {'C:\Users\suhri\Desktop\ECE 251C\Project\DIV2K' };" in our case.
 
-Third, run 'A_data_generation.m'
+Third, run 'A_data_generation.m' and confirm that the patches are being generated.
+
 
 ## Experiments performed
 
