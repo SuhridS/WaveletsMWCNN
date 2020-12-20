@@ -154,7 +154,7 @@ go to 'MWCNNv2\MWCNN_code\model\common.py'
 
 1) MWCNN vs DnCNN
 
-![](\images\mwcnnvsdncnn.png)
+![MWCNN vs DnCNN](./images/mwcnnvsdncnn.png)
 2) Effect of type and scale of noise
 
 3) Effect of noise level and lighting conditions
