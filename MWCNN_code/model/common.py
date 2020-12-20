@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import numpy as np
 from torch.autograd import Variable
 import pywt
+import cv2
 
 
 def default_conv(in_channels, out_channels, kernel_size, bias=True, dilation=1):
@@ -64,86 +65,92 @@ def sp_init(x):
 
     return torch.cat((x_LL, x_HL, x_LH, x_HH), 1)
 
-# def dwt_init(x):
-#     x01 = x[:, :, 0::2, :] / 2
-#     x02 = x[:, :, 1::2, :] / 2
-#     x1 = x01[:, :, :, 0::2]
-#     x2 = x02[:, :, :, 0::2]
-#     x3 = x01[:, :, :, 1::2]
-#     x4 = x02[:, :, :, 1::2]
-#     x_LL = x1 + x2 + x3 + x4
-#     x_HL = -x1 - x2 + x3 + x4
-#     x_LH = -x1 + x2 - x3 + x4
-#     x_HH = x1 - x2 - x3 + x4
-#     return torch.cat((x_LL, x_HL, x_LH, x_HH), 1)
-
-def dwt_init(x): # Biorthogonal filter 1.1
-    x = x.cpu().detach().numpy()
-    # print("x is detached")
-    x_LL = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2, x.shape[3] // 2))
-    x_LH = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2, x.shape[3] // 2))
-    x_HL = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2, x.shape[3] // 2))
-    x_HH = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2, x.shape[3] // 2))
-    for i in range (x.shape[0]):
-	    for j in range(x.shape[1]):
-		    val = x[i,j, :, :]
-		    coeffs = pywt.dwt2(val, 'db5') # symlet 5, dabu 5, bior 2.4
-
-		    x_LL[i,j, :, :] = coeffs[0][2:-2, 2:-2]
-		    x_LH[i,j, :, :] = coeffs[1][0][2:-2, 2:-2]
-		    x_HL[i,j, :, :] = coeffs[1][1][2:-2, 2:-2]
-		    x_HH[i,j, :, :] = coeffs[1][2][2:-2, 2:-2]
-    # print("Looping done")
-    x_LL,  x_LH, x_HL, x_HH = torch.from_numpy(x_LL).float().cuda(), torch.from_numpy(x_LH).float().cuda(), torch.from_numpy(x_HL).float().cuda(), torch.from_numpy(x_HH).float().cuda()
-    
-    # print("Converted to torch tensor")
+def dwt_init(x):
+    x01 = x[:, :, 0::2, :] / 2
+    x02 = x[:, :, 1::2, :] / 2
+    x1 = x01[:, :, :, 0::2]
+    x2 = x02[:, :, :, 0::2]
+    x3 = x01[:, :, :, 1::2]
+    x4 = x02[:, :, :, 1::2]
+    x_LL = x1 + x2 + x3 + x4
+    x_HL = -x1 - x2 + x3 + x4
+    x_LH = -x1 + x2 - x3 + x4
+    x_HH = x1 - x2 - x3 + x4
     return torch.cat((x_LL, x_HL, x_LH, x_HH), 1)
 
+# def dwt_init(x): # Biorthogonal filter 1.1
+#     x = x.cpu().detach().numpy()
+#     # print("x is detached")
+#     x_LL = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2 + 4, x.shape[3] // 2 + 4))
+#     x_LH = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2 + 4, x.shape[3] // 2 + 4))
+#     x_HL = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2 + 4, x.shape[3] // 2 + 4))
+#     x_HH = np.zeros((x.shape[0], x.shape[1], x.shape[2] // 2 + 4, x.shape[3] // 2 + 4))
+#     for i in range (x.shape[0]):
+# 	    for j in range(x.shape[1]):
+# 		    val = x[i,j, :, :]
+# 		    coeffs = pywt.dwt2(val, 'db5') # symlet 5, dabu 5, bior 2.4
 
+# 		    x_LL[i,j, :, :] = coeffs[0] #[2:-2, 2:-2] 
+# 		    x_LH[i,j, :, :] = coeffs[1][0]
+# 		    x_HL[i,j, :, :] = coeffs[1][1]
+# 		    x_HH[i,j, :, :] = coeffs[1][2]
 
-def iwt_init(x):
-    out_channel = x.shape[1] // 4
-    x = x.cpu().detach().numpy()
-    x1 = x[:, 0:out_channel, :, :]
-    x2 = x[:, out_channel:out_channel * 2, :, :]
-    x3 = x[:, out_channel * 2:out_channel * 3, :, :]
-    x4 = x[:, out_channel * 3:out_channel * 4, :, :]
-    for i in range (x.shape[0]):
-	    for j in range(out_channel):
-	    	h = pywt.idwt2((np.pad(x1[i,j,:,:], (2,2), mode='symmetric'),(np.pad(x2[i,j,:,:], (2,2), mode='symmetric'), \
-	    		np.pad(x3[i,j,:,:], (2,2), mode='symmetric'), np.pad(x3[i,j,:,:], (2,2), mode='symmetric'))), 'db5')
-    h = torch.from_numpy(h).float().cuda()
-    # h = torch.zeros([out_batch, out_channel, out_height, out_width]).float().cuda()
-
-    # h[:, :, 0::2, 0::2] = x1 - x2 - x3 + x4
-    # h[:, :, 1::2, 0::2] = x1 - x2 + x3 - x4
-    # h[:, :, 0::2, 1::2] = x1 + x2 - x3 - x4
-    # h[:, :, 1::2, 1::2] = x1 + x2 + x3 + x4
-    # print("Shape of h is", h.shape)
-    return h
+# 		    # x_LL[i,j, :, :] = cv2.resize(coeffs[0], dsize=(x.shape[2] // 2, x.shape[3] // 2), interpolation=cv2.INTER_CUBIC)
+# 		    # x_LH[i,j, :, :] = cv2.resize(coeffs[1][0], dsize=(x.shape[2] // 2, x.shape[3] // 2), interpolation=cv2.INTER_CUBIC)
+# 		    # x_HL[i,j, :, :] = cv2.resize(coeffs[1][1], dsize=(x.shape[2] // 2, x.shape[3] // 2), interpolation=cv2.INTER_CUBIC)
+# 		    # x_HH[i,j, :, :] = cv2.resize(coeffs[1][2], dsize=(x.shape[2] // 2, x.shape[] // 2), interpolation=cv2.INTER_CUBIC)
+#     # print("Looping done")
+#     x_LL,  x_LH, x_HL, x_HH = torch.from_numpy(x_LL).float().cuda(), torch.from_numpy(x_LH).float().cuda(), torch.from_numpy(x_HL).float().cuda(), torch.from_numpy(x_HH).float().cuda()
+    
+#     # print("Converted to torch tensor")
+#     return torch.cat((x_LL, x_HL, x_LH, x_HH), 1)
 
 
 
 # def iwt_init(x):
-#     r = 2
-#     in_batch, in_channel, in_height, in_width = x.size()
-#     #print([in_batch, in_channel, in_height, in_width])
-#     out_batch, out_channel, out_height, out_width = in_batch, int(
-#         in_channel / (r ** 2)), r * in_height, r * in_width
-#     x1 = x[:, 0:out_channel, :, :] / 2
-#     x2 = x[:, out_channel:out_channel * 2, :, :] / 2
-#     x3 = x[:, out_channel * 2:out_channel * 3, :, :] / 2
-#     x4 = x[:, out_channel * 3:out_channel * 4, :, :] / 2
+#     out_channel = x.shape[1] // 4
+#     x = x.cpu().detach().numpy()
+#     x1 = x[:, 0:out_channel, :, :]
+#     x2 = x[:, out_channel:out_channel * 2, :, :]
+#     x3 = x[:, out_channel * 2:out_channel * 3, :, :]
+#     x4 = x[:, out_channel * 3:out_channel * 4, :, :]
+#     for i in range (x.shape[0]):
+# 	    for j in range(out_channel):
+# 	    	# h = pywt.idwt2((np.pad(x1[i,j,:,:], (2,2), mode='symmetric'),(np.pad(x2[i,j,:,:], (2,2), mode='symmetric'), \
+# 	    	# 	np.pad(x3[i,j,:,:], (2,2), mode='symmetric'), np.pad(x3[i,j,:,:], (2,2), mode='symmetric'))), 'db5')
+# 	        h = pywt.idwt2((x1[i,j,:,:],(x2[i,j,:,:],x3[i,j,:,:],x4[i,j,:,:])), 'db5')
+#     h = torch.from_numpy(h).float().cuda()
+#     # h = torch.zeros([out_batch, out_channel, out_height, out_width]).float().cuda()
+
+#     # h[:, :, 0::2, 0::2] = x1 - x2 - x3 + x4
+#     # h[:, :, 1::2, 0::2] = x1 - x2 + x3 - x4
+#     # h[:, :, 0::2, 1::2] = x1 + x2 - x3 - x4
+#     # h[:, :, 1::2, 1::2] = x1 + x2 + x3 + x4
+#     # print("Shape of h is", h.shape)
+#     return h
+
+
+
+def iwt_init(x):
+    r = 2
+    in_batch, in_channel, in_height, in_width = x.size()
+    #print([in_batch, in_channel, in_height, in_width])
+    out_batch, out_channel, out_height, out_width = in_batch, int(
+        in_channel / (r ** 2)), r * in_height, r * in_width
+    x1 = x[:, 0:out_channel, :, :] / 2
+    x2 = x[:, out_channel:out_channel * 2, :, :] / 2
+    x3 = x[:, out_channel * 2:out_channel * 3, :, :] / 2
+    x4 = x[:, out_channel * 3:out_channel * 4, :, :] / 2
     
 
-#     h = torch.zeros([out_batch, out_channel, out_height, out_width]).float().cuda()
+    h = torch.zeros([out_batch, out_channel, out_height, out_width]).float().cuda()
 
-#     h[:, :, 0::2, 0::2] = x1 - x2 - x3 + x4
-#     h[:, :, 1::2, 0::2] = x1 - x2 + x3 - x4
-#     h[:, :, 0::2, 1::2] = x1 + x2 - x3 - x4
-#     h[:, :, 1::2, 1::2] = x1 + x2 + x3 + x4
+    h[:, :, 0::2, 0::2] = x1 - x2 - x3 + x4
+    h[:, :, 1::2, 0::2] = x1 - x2 + x3 - x4
+    h[:, :, 0::2, 1::2] = x1 + x2 - x3 - x4
+    h[:, :, 1::2, 1::2] = x1 + x2 + x3 + x4
 
-#     return h
+    return h
 
 
 class Channel_Shuffle(nn.Module):
