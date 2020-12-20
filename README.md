@@ -2,7 +2,7 @@
 * This project focuses on experiments to prove or disprove the efficacy of the MWCNN (Multi Wavelet Convolutional Neural Network) architecture under different lighting conditions and multiple noise inputs.
 * We also plan on tweaking the network architecture to see if changing the activation function, wavelet used or network depth and other hyperparameters can help improving the PSNR or speed of performance.
 * The following sections would help provide a deeper insight into the experiments performed.
-
+* Reference: https://github.com/lpj-github-io/MWCNNv2
 
 
 ## File structure
