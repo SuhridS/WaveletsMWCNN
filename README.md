@@ -99,20 +99,65 @@ Third, run 'A_data_generation.m' and confirm that the patches are being generate
 
 Step 3: Downloading test data
 You can use any test data of your choice.
-Some popular datasets have been downloaded [here](https://drive.google.com/drive/folders/1HlIgV_l-RD-0bI5PTGj3F5VGWW7tZi1O?usp=sharing).
+Some popular datasets have been uploaded [here](https://drive.google.com/drive/folders/1HlIgV_l-RD-0bI5PTGj3F5VGWW7tZi1O?usp=sharing).
 
 
 ## Experiments performed
 
+1) MWCNN vs DnCNN
+	* Comparing the MWCNN model's performance under different noise levels with it's 'wavelet-less' counterpart
+
+2) Effect of type and scale of noise
+	* Checking if changing the type of noise (Gaussian / Poisson) or noise level (sigma 15, 30, 50) produces different results.
+
+3) Effect of noise level and lighting conditions
+	* Testing model's performance under different lighting conditions.
+
+4) Effect of different wavelets
+	* Using different wavelets - Haar, Symlet5, Daubechies5, Biorthogonal 2.4 to see if the denoising performance improves.
+
+5) Cropped model vs New model
+	* Creating a new model to accommodate the resized subband images of higher order filters.
 
 
 ## Training and Testing
 
+### Training:
+
+To train the model, run the following from the MWCNN environment.
+```bash
+python main.py --model MWCNN --save MWCNN_DeNoising --scale 15 --n_feats 64 --save_results --print_model --patch_size 256 --batch_size 4 --print_every 50 --lr 1.024e-4 --lr_decay 100 --n_colors 3 --save_models --task_type denoising --noise 'G'
+```
+* Change the scale (sigma value) to 15, 30 and 50 to reproduce the results we got for different noise levels.
+* Change noise to 'G' for Gaussian noise and 'S' for Poisson noise.
+* When using Haar Wavelet, use n_feats = 64. If using higher order filters, change number of features accordingly to accomodate the new sub-band image sizes.
+* For Symlet5, Daubechies5 and Biorthogonal 2.4, we used n_feats = 66.
+
+
+### Testing: 
+* The pretrained models can be found [here](https://drive.google.com/drive/folders/1HlIgV_l-RD-0bI5PTGj3F5VGWW7tZi1O?usp=sharing).
+* If you download the single channel weights, remember to change n_colors to 1 else use 3.
+
+```bash
+python main.py --model MWCNN --save MWCNN_DeNoising --scale 15 --n_feats 64 --save_results --print_model --n_colors 3 --test_only --resume -1 --pre_train pretrained_models/ --data_test Set5 --task_type denoising --noise 'G'
+```
 
 ## Changes made
 
+* To change the wavelet used,
+go to 'MWCNNv2\MWCNN_code\model\common.py'
 
-## Pretrained models
-
+* Comment out lines 68-79 and uncomment lines 81-106.
+* Comment out lines 134-153 and uncomment lines 110-130. Change the wavelet used based on the [pywavelets documentation](https://pywavelets.readthedocs.io/en/latest/).
 
 ## Results
+
+1) MWCNN vs DnCNN
+
+2) Effect of type and scale of noise
+
+3) Effect of noise level and lighting conditions
+
+4) Effect of different wavelets
+
+5) Cropped model vs New model
