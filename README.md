@@ -155,10 +155,26 @@ go to 'MWCNNv2\MWCNN_code\model\common.py'
 1) MWCNN vs DnCNN
 
 ![MWCNN vs DnCNN](./images/mwcnnvsdncnn.png)
+
+
+
 2) Effect of type and scale of noise
+
+![Effect of noise](./images/gvsp.png)
+
 
 3) Effect of noise level and lighting conditions
 
+![Effect of lighting](./images/lighting.png)
+
 4) Effect of different wavelets
 
+![Effect of using Different Wavelets](./images/crop.png)
+
 5) Cropped model vs New model
+
+![Effect of changing model size](./images/cropvsnew.png)
+
+6) Haar vs Daubechies reconstruction noise comparison
+
+![Haar vs Daubechies](./images/output_final.png)
