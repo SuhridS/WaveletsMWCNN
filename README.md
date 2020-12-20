@@ -178,3 +178,8 @@ go to 'MWCNNv2\MWCNN_code\model\common.py'
 6) Haar vs Daubechies reconstruction noise comparison
 
 ![Haar vs Daubechies](./images/output_final.png)
+
+
+## Acknowledgements
+
+We would like to thank Prof.Truong Nguyen and TA Yiqian Wang for guiding us throughout this project and teaching us Filter Banks and Wavelets and their real world applications.
